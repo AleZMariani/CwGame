@@ -1,32 +1,40 @@
-var DIM_TABLE = 5;
+var DIM_TABLE_SIDE = 5;
 var NUM_IT = 256;
 var table = [];
 
 
 function print(){
-    for(var x=0;x<DIM_TABLE;x++){
-      console.log('%s %s %s %s %s', table[x][0],table[x][1],table[x][2],table[x][3],table[x][4]);
+    for(var x=0;x<DIM_TABLE_SIDE;x++){
+      var bp = new Buffer(DIM_TABLE_SIDE*2);
+        for(var y=0;y<DIM_TABLE_SIDE;y++){
+          bp.write(table[x][y],y*2,1,'utf8');
+          bp.write(' ',y*2+1,1,'utf8');
+        }
+        var out = bp.toString('utf8',0,DIM_TABLE_SIDE*2);
+        console.log(out);
     }
+
     console.log("");
     console.log("");
     console.log("");
 
 };
 
-function init(){
-  for(var x=0;x<DIM_TABLE;x++){
-    table[x]=[];
-    table[x][0]='O';
-    table[x][1]='O';
-    table[x][2]='O';
-    table[x][3]='O';
-    table[x][4]='O';
+function init_empty(){
+  for(var x=0;x<DIM_TABLE_SIDE;x++){
+    table[x] = [];
+    for(var y=0;y<DIM_TABLE_SIDE;y++){
+      table[x][y] = 'O';
+    }
   }
+};
+
+function load_init_life(){
   table[1][2] = 'X';
   table[2][2] = 'X';
   table[3][2] = 'X';
 
-};
+}
 
 function clone (existingArray) {
   var newObj = (existingArray instanceof Array) ? [] : {};
@@ -119,8 +127,8 @@ function update_life_status(x,y,nxt_life_status,table){
 
 function tick(){
   var new_table = clone(table);
-  for(var x=0;x<DIM_TABLE;x++){
-    for(var y=0;y<DIM_TABLE;y++){
+  for(var x=0;x<DIM_TABLE_SIDE;x++){
+    for(var y=0;y<DIM_TABLE_SIDE;y++){
 
       var num_alive_neigh = checkNumNeighAlive(x,y);
       var nxt_life_status = rules(num_alive_neigh,table[x][y]);
@@ -133,7 +141,8 @@ function tick(){
 };
 
 var main = function(num){
-  init();
+  init_empty();
+  load_init_life();
   print();
   var num_ite = num || NUM_IT;
 
