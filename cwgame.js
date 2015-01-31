@@ -1,53 +1,15 @@
 var DEFAULT_DIM_TABLE_SIDE = 5;
 var DEFAULT_NUM_IT = 256;
 var table = [];
-var iteractive = false;
-
-
-exports.print = function (){
-    for(var x=0;x<DIM_TABLE_SIDE;x++){
-      var bp = new Buffer(DIM_TABLE_SIDE*2);
-        for(var y=0;y<DIM_TABLE_SIDE;y++){
-          bp.write(table[x][y],y*2,1,'utf8');
-          bp.write(' ',y*2+1,1,'utf8');
-        }
-        var out = bp.toString('utf8',0,DIM_TABLE_SIDE*2);
-        console.log(out);
-    }
-
-    console.log("");
-    console.log("");
-    console.log("");
-
-};
 
 function init_empty(){
   for(var x=0;x<DIM_TABLE_SIDE;x++){
     table[x] = [];
     for(var y=0;y<DIM_TABLE_SIDE;y++){
-      table[x][y] = 'O';
+      table[x][y] = 0;
     }
   }
 };
-
-function default_life(){
-  table[1][2] = 'O';
-  table[2][2] = 'O';
-  table[3][2] = 'O';
-}
-
-exports.load_init_life = function (data){
-  if(data){
-
-    var jsonData = JSON.parse(JSON.stringify(data));
-    var initial_life = jsonData.initial_life || [];
-    for(var i=0; i<initial_life.length; i++){
-        table[initial_life[i].x][initial_life[i].y] = 'X'
-    }
-  }else{
-    default_life();
-  }
-}
 
 
 function clone (existingArray) {
@@ -67,42 +29,42 @@ function checkNumNeighAlive(x,y){
 
   var num_alive = 0;
   if(table[x-1] && table[y-1] && table[x-1][y-1]){
-    if(table[x-1][y-1] == 'X'){
+    if(table[x-1][y-1] == 1){
       num_alive += 1;
     }
   }
   if(table[x-1] && table[x-1][y]){
-    if(table[x-1][y] == 'X'){
+    if(table[x-1][y] == 1){
       num_alive += 1;
     }
   }
   if(table[x-1] && table[y+1] && table[x-1][y+1]){
-    if(table[x-1][y+1] == 'X'){
+    if(table[x-1][y+1] == 1){
       num_alive += 1;
     }
   }
   if(table[y-1] && table[x][y-1]){
-    if(table[x][y-1] == 'X'){
+    if(table[x][y-1] == 1){
       num_alive += 1;
     }
   }
   if(table[y+1] && table[y+1] &&  table[x][y+1]){
-    if(table[x][y+1] == 'X'){
+    if(table[x][y+1] == 1){
       num_alive += 1;
     }
   }
   if(table[x+1] && table[y-1] && table[x+1][y-1]){
-    if(table[x+1][y-1] == 'X'){
+    if(table[x+1][y-1] == 1){
       num_alive += 1;
     }
   }
   if(table[x+1] && table[x+1][y]){
-    if(table[x+1][y] == 'X'){
+    if(table[x+1][y] == 1){
       num_alive += 1;
     }
   }
   if(table[x+1] && table[y+1] && table[x+1][y+1]){
-    if(table[x+1][y+1] == 'X'){
+    if(table[x+1][y+1] == 1){
       num_alive += 1;
     }
   }
@@ -118,19 +80,19 @@ Any dead cell with exactly three live neighbours becomes a live cell, as if by r
 */
 function rules(na,current_life)
 {
-  var new_life_status = 'O';
+  var new_life_status = 0;
 
-  if((na<2) && (current_life=='X')){
-    new_life_status= 'O';
+  if((na<2) && (current_life==1)){
+    new_life_status= 0;
   }
-  if(((na==2)||(na==3)) && (current_life=='X')){
-    new_life_status= 'X';
+  if(((na==2)||(na==3)) && (current_life==1)){
+    new_life_status= 1;
   }
-  if((na==3) && (current_life=='O')){
-    new_life_status= 'X';
+  if((na==3) && (current_life==0)){
+    new_life_status= 1;
   }
-  if((na>3) && (current_life=='X')){
-    new_life_status= 'O';
+  if((na>3) && (current_life==1)){
+    new_life_status= 0;
   }
   return new_life_status;
 }
@@ -154,17 +116,14 @@ function tick(){
 
 };
 
-exports.setIteractive = function(val){
-    iteractive = val;
-}
 
-exports.init_size = function(size){
+function init_size(size){
   DIM_TABLE_SIDE = size || DEFAULT_DIM_TABLE_SIDE;
   init_empty();
 
 }
 
-exports.start = function(num_iteration){
+function start(num_iteration){
   NUM_IT         = num_iteration || DEFAULT_NUM_IT;
   for(var i=0;i<NUM_IT;i++){
     tick();
@@ -172,5 +131,32 @@ exports.start = function(num_iteration){
       this.print();
     }
   }
+}
 
+function load_init_life(data){
+    var jsonData = JSON.parse(JSON.stringify(data));
+    var initial_life = jsonData.initial_life || [];
+
+    for(var i=0; i<initial_life.length; i++){
+        if(initial_life[i]==1 || initial_life[i]=='X')
+        {
+          table[Math.floor(i/DIM_TABLE_SIDE)][i%DIM_TABLE_SIDE]=1;
+        }
+
+    }
+}
+
+exports.printOX = function (data){
+  x = 0;
+  while(x<data.length){
+    console.log(data.slice(x,x+DIM_TABLE_SIDE));
+    x+=DIM_TABLE_SIDE;
+  }
+};
+
+exports.gotoIt = function(size,it,initial_life){
+  init_size(size);
+  load_init_life(initial_life);
+  start(it);
+  return JSON.parse( '{"final_state":"'+table.join(',')+"\"}"  );
 }
