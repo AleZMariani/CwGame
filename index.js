@@ -33,8 +33,8 @@ var main = function(num){
               ]
   });
   cwgame.print();
-  cwgame.setIteractive(true);
-  cwgame.start(10);
+  cwgame.setIteractive(false);
+  cwgame.start(100);
   cwgame.print();
 }
 

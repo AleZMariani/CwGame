@@ -1,5 +1,5 @@
-var DIM_TABLE_SIDE = 5;
-var NUM_IT = 256;
+var DEFAULT_DIM_TABLE_SIDE = 5;
+var DEFAULT_NUM_IT = 256;
 var table = [];
 var iteractive = false;
 
@@ -159,13 +159,13 @@ exports.setIteractive = function(val){
 }
 
 exports.init_size = function(size){
-  DIM_TABLE_SIDE = size || DIM_TABLE_SIDE;
+  DIM_TABLE_SIDE = size || DEFAULT_DIM_TABLE_SIDE;
   init_empty();
 
 }
 
 exports.start = function(num_iteration){
-  NUM_IT         = num_iteration || NUM_IT;
+  NUM_IT         = num_iteration || DEFAULT_NUM_IT;
   for(var i=0;i<NUM_IT;i++){
     tick();
     if(iteractive){
