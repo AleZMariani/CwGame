@@ -127,9 +127,6 @@ function start(num_iteration){
   NUM_IT         = num_iteration || DEFAULT_NUM_IT;
   for(var i=0;i<NUM_IT;i++){
     tick();
-    if(iteractive){
-      this.print();
-    }
   }
 }
 
