@@ -1,9 +1,10 @@
 var DIM_TABLE_SIDE = 5;
 var NUM_IT = 256;
 var table = [];
+var iteractive = false;
 
 
-function print(){
+exports.print = function (){
     for(var x=0;x<DIM_TABLE_SIDE;x++){
       var bp = new Buffer(DIM_TABLE_SIDE*2);
         for(var y=0;y<DIM_TABLE_SIDE;y++){
@@ -30,25 +31,22 @@ function init_empty(){
 };
 
 function default_life(){
-  table[1][2] = 'X';
-  table[2][2] = 'X';
-  table[3][2] = 'X';
+  table[1][2] = 'O';
+  table[2][2] = 'O';
+  table[3][2] = 'O';
 }
 
-exports.load_init_life = function (life){
-  if(life){
+exports.load_init_life = function (data){
+  if(data){
 
-    life.forEach(function(e,i,a){
-      if(e.length == 2)
-      {
-        table[e[0]][e[1]] = 'X';
-      }
-    })
+    var jsonData = JSON.parse(JSON.stringify(data));
+    var initial_life = jsonData.initial_life || [];
+    for(var i=0; i<initial_life.length; i++){
+        table[initial_life[i].x][initial_life[i].y] = 'X'
+    }
   }else{
     default_life();
   }
-
-
 }
 
 
@@ -156,18 +154,23 @@ function tick(){
 
 };
 
-exports.init = function(size){
+exports.setIteractive = function(val){
+    iteractive = val;
+}
+
+exports.init_size = function(size){
   DIM_TABLE_SIDE = size || DIM_TABLE_SIDE;
   init_empty();
 
 }
 
 exports.start = function(num_iteration){
-  print();
   NUM_IT         = num_iteration || NUM_IT;
   for(var i=0;i<NUM_IT;i++){
     tick();
-    print();
+    if(iteractive){
+      this.print();
+    }
   }
 
 }
